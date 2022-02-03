@@ -6,10 +6,17 @@
             <h1>Posts List</h1>
         </div>
         <div class="row">
-            <a class="btn btn-primary" href="{{ route('admin.posts.create')}}">Add new Post</a>
+            <a class="btn btn-primary" href="{{ route('admin.posts.create') }}">Add new Post</a>
+        </div>
+        <div class="row my-2">
+            @if (session('deleted'))
+                <div class="col-12 alert alert-danger" role="alert">
+                    {{ session('deleted') }}
+                </div>
+            @endif
         </div>
         <div class="row">
-            <table class="table my-2">
+            <table class="table my-1">
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
@@ -27,7 +34,9 @@
                             {{-- <td>{{$post->slug}}</td> --}}
                             <td><a class="btn btn-primary" href="{{ route('admin.posts.show', $post) }}">Show</a></td>
                             <td>
-                                <form action="{{ route('admin.posts.destroy', $post) }}" method="POST">
+                                <form
+                                    onsubmit="return confirm('Do you wish to continue and delete: {{ $post->title }} ?')"
+                                    action="{{ route('admin.posts.destroy', $post) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger">Delete</button>

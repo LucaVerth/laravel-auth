@@ -37,13 +37,26 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate(
+            [
+                'title' => 'required|max:255|min:2',
+                'content' => 'required'
+            ],
+            [
+                'title.required' => 'Post title is always required',
+                'title.min' => 'Post title must be made of least :min characters',
+                'title.max' => 'Post title must contain only :max characters',
+                'content.required' => 'Post content or description is required'
+            ]
+        );
         $data = $request->all();
         $new_post = new Post();
         $new_post->fill($data);
         $new_post->slug = Post::createSlug($data['title']);
         $new_post->save();
 
-        return redirect()->route('admin.posts.show', $new_post);
+        return redirect()->route('admin.posts.show', $new_post)->with('created', 'New post created successfully');
     }
 
     /**
@@ -55,7 +68,6 @@ class PostsController extends Controller
     public function show($id)
     {
         $post = Post::find($id);
-
         return view('admin.posts.show', compact('post'));
     }
 
@@ -78,9 +90,26 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $request->validate(
+            [
+                'title' => 'required|max:255|min:2',
+                'content' => 'required'
+            ],
+            [
+                'title.required' => 'Post title is always required',
+                'title.min' => 'Post title must be made of least :min characters',
+                'title.max' => 'Post title must contain only :max characters',
+                'content.required' => 'Post content or description is required'
+            ]
+        );
+        $data = $request->all();
+        if($data['title'] != $post->title){
+            $data['slug'] = Post::createSlug($data['title']);
+        }
+        $post->update($data);
+        return redirect()->route('admin.posts.show', $post);
     }
 
     /**
@@ -89,8 +118,9 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('admin.posts.index')->with('deleted', 'Post successfully deleted from Database');
     }
 }
