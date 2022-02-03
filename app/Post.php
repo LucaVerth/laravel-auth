@@ -8,8 +8,14 @@ use Illuminate\Support\Str;
 
 class Post extends Model
 {
-    public static function createSlug($title){
 
+    protected $fillable = [
+        'title',
+        'content',
+        'slug'
+    ];
+
+    public static function createSlug($title){
 
         $slug = Str::slug($title);
         $base_slug = $slug;
